@@ -1,234 +1,61 @@
-# RESTful API Design – Room Booking System
+ขั้นตอนที่ 1: Setup
+mkdir week7-lab
+cd week7-lab
+npm init -y
+npm install express cors sqlite3
+npm install --save-dev nodemon
+ขั้นตอนที่ 2: สร้างโครงสร้าง
+mkdir database services controllers routes
+touch server.js README.md
+API Endpoints 
+ต้องมี 15 Endpoints:
 
-## Base URL
-/api
-
-yaml
-คัดลอกโค้ด
-
----
-
-## 1. Rooms (ห้องประชุม)
-
-### Get All Rooms
-GET /api/rooms
-
-yaml
-คัดลอกโค้ด
-ดึงรายการห้องประชุมทั้งหมด
-
-**Status Code**
-- 200 OK
-
----
-
-### Get Room by ID
-GET /api/rooms/:id
-
-yaml
-คัดลอกโค้ด
-ดึงข้อมูลห้องประชุมเพียงห้องเดียว
-
-**Status Code**
-- 200 OK
-- 404 Not Found
-
----
-
-### Create Room
-POST /api/rooms
-
-css
-คัดลอกโค้ด
-สร้างห้องประชุมใหม่ (เฉพาะเจ้าหน้าที่)
-
-**Request Body**
-```json
-{
-  "roomname": "Meeting Room A",
-  "capacity": 20,
-  "location": "Building A",
-  "status": "available"
-}
-Status Code
-
-201 Created
-
-403 Forbidden
-
-Update Room
-bash
-คัดลอกโค้ด
-PUT /api/rooms/:id
-แก้ไขข้อมูลห้องประชุม (เฉพาะเจ้าหน้าที่)
-
-Request Body
-
-json
-คัดลอกโค้ด
-{
-  "roomname": "Meeting Room A",
-  "capacity": 25,
-  "location": "Building A",
-  "status": "available"
-}
-Status Code
-
-200 OK
-
-404 Not Found
-
-Delete Room
-bash
-คัดลอกโค้ด
-DELETE /api/rooms/:id
-ลบห้องประชุม (เฉพาะเจ้าหน้าที่)
-
-Status Code
-
-204 No Content
-
-404 Not Found
-
-2. Bookings (การจอง)
-Get All Bookings
-bash
-คัดลอกโค้ด
-GET /api/bookings
-ดึงรายการการจองทั้งหมด (เจ้าหน้าที่)
-
-Status Code
-
-200 OK
-
-Get My Bookings
-bash
-คัดลอกโค้ด
-GET /api/bookings/my
-ดึงรายการการจองของผู้ใช้ที่ login อยู่
-
-Status Code
-
-200 OK
-
-401 Unauthorized
-
-Create Booking
-bash
-คัดลอกโค้ด
-POST /api/bookings
-สร้างการจองห้องใหม่
-
-Request Body
-
-json
-คัดลอกโค้ด
-{
-  "room_id": 1,
-  "booking_date": "2026-02-01",
-  "start_time": "09:00",
-  "end_time": "11:00",
-  "purpose": "Project Meeting"
-}
-Status Code
-
-201 Created
-
-409 Conflict (เวลาจองซ้อน)
-
-Cancel Booking
-bash
-คัดลอกโค้ด
-DELETE /api/bookings/:id
-ยกเลิกการจอง (เจ้าของการจองหรือเจ้าหน้าที่)
-
-Status Code
-
-204 No Content
-
-403 Forbidden
-
-Approve Booking
-bash
-คัดลอกโค้ด
-PATCH /api/bookings/:id/approve
-อนุมัติการจอง (เฉพาะเจ้าหน้าที่)
-
-Request Body
-
-json
-คัดลอกโค้ด
-{
-  "status": "approved"
-}
-Status Code
-
-200 OK
-
-403 Forbidden
-
-3. Authentication & Users
-Login
-bash
-คัดลอกโค้ด
-POST /api/auth/login
-Request Body
-
-json
-คัดลอกโค้ด
-{
-  "username": "user01",
-  "password": "123456"
-}
-Response
-
-json
-คัดลอกโค้ด
-{
-  "access_token": "jwt_token"
-}
-Status Code
-
-200 OK
-
-401 Unauthorized
-
-Register
-arduino
-คัดลอกโค้ด
-POST /api/auth/register
-Request Body
-
-json
-คัดลอกโค้ด
-{
-  "username": "user01",
-  "password": "123456",
-  "full_name": "Somchai Jaidee",
-  "email": "somchai@email.com"
-}
-Status Code
-
-201 Created
-
-Get User Profile
-bash
-คัดลอกโค้ด
-GET /api/users/profile
-ดูข้อมูลผู้ใช้ของตนเอง
-
-Status Code
-
-200 OK
-
-401 Unauthorized
-
-4. HTTP Status Codes Summary
-Status Code	Description
-200	OK
-201	Created
-204	No Content
-401	Unauthorized
-403	Forbidden
-404	Not Found
-409	Conflict
+Books API (5 endpoints)
+GET    /api/books              # ดึงหนังสือทั้งหมด
+GET    /api/books/:id          # ดึงหนังสือ 1 เล่ม
+GET    /api/books/search?q=    # ค้นหาหนังสือ
+POST   /api/books              # เพิ่มหนังสือ
+PUT    /api/books/:id          # แก้ไขหนังสือ
+Members API (4 endpoints)
+GET    /api/members            # ดึงสมาชิกทั้งหมด
+GET    /api/members/:id        # ดึงสมาชิก 1 คน
+POST   /api/members            # เพิ่มสมาชิก
+PUT    /api/members/:id        # แก้ไขสมาชิก
+Borrowings API (6 endpoints)
+GET    /api/borrowings                    # ดึงรายการยืมทั้งหมด
+GET    /api/borrowings/:id                # ดึงรายการยืม 1 รายการ
+GET    /api/borrowings/member/:memberId   # ดึงรายการยืมของสมาชิก
+POST   /api/borrowings/borrow             # ยืมหนังสือ
+PUT    /api/borrowings/:id/return         # คืนหนังสือ
+GET    /api/borrowings/overdue            # ดูรายการเกินกำหนด
+Test Case 1: Borrow Book (Success)
+![Borrow Book (Success)](./assets/Test%20Case%201:%20Borrow%20Book%20(Success).png)
+Test Case 2: Borrow Book (Fail - No copies)
+![Borrow Book (Fail - No copies)](./assets/Test%20Case%202:%20Borrow%20Book%20(Fail%20-%20No%20copies).png)
+Test Case 3: Return Book (With Fine)
+![Return Book (With Fine)](./assets/Test%20Case%203:%20Return%20Book%20(With%20Fine).png)
+ER Diagram (Draw.io หรือ dbdiagram.io)
+```mermaid
+erDiagram
+    BOOKS ||--o{ BORROWINGS : "has"}
+    MEMBERS ||--o{ BORROWINGS : "performs"}
+    
+    BOOKS {
+        int id PK
+        string title
+        string author
+        int available_copies
+    }
+    MEMBERS {
+        int id PK
+        string name
+        string status
+    }
+    BORROWINGS {
+        int id PK
+        int book_id FK
+        int member_id FK
+        date borrow_date
+        date due_date
+        string status
+    }
