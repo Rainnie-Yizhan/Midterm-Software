@@ -37,8 +37,8 @@ Test Case 3: Return Book (With Fine)
 ER Diagram (Draw.io หรือ dbdiagram.io)
 ```mermaid
 erDiagram
-    BOOKS ||--o{ BORROWINGS : "has"}
-    MEMBERS ||--o{ BORROWINGS : "performs"}
+    BOOKS ||--o{ BORROWINGS : "has"
+    MEMBERS ||--o{ BORROWINGS : "performs"
     
     BOOKS {
         int id PK
